@@ -31,7 +31,7 @@
       this.exitBtn = new System.Windows.Forms.Button();
       this.saveBtn = new System.Windows.Forms.Button();
       this.label1 = new System.Windows.Forms.Label();
-      this.textBox1 = new System.Windows.Forms.TextBox();
+      this.txtAccessToken = new System.Windows.Forms.TextBox();
       this.errorLabel = new System.Windows.Forms.Label();
       this.SuspendLayout();
       // 
@@ -59,6 +59,7 @@
       this.saveBtn.TabIndex = 2;
       this.saveBtn.Text = "Save";
       this.saveBtn.UseVisualStyleBackColor = false;
+      this.saveBtn.Click += new System.EventHandler(this.saveBtn_Click);
       // 
       // label1
       // 
@@ -69,12 +70,12 @@
       this.label1.TabIndex = 3;
       this.label1.Text = "Access Token:";
       // 
-      // textBox1
+      // txtAccessToken
       // 
-      this.textBox1.Location = new System.Drawing.Point(168, 83);
-      this.textBox1.Name = "textBox1";
-      this.textBox1.Size = new System.Drawing.Size(216, 22);
-      this.textBox1.TabIndex = 4;
+      this.txtAccessToken.Location = new System.Drawing.Point(168, 83);
+      this.txtAccessToken.Name = "txtAccessToken";
+      this.txtAccessToken.Size = new System.Drawing.Size(216, 22);
+      this.txtAccessToken.TabIndex = 4;
       // 
       // errorLabel
       // 
@@ -91,7 +92,7 @@
       this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(160)))), ((int)(((byte)(240)))), ((int)(((byte)(237)))));
       this.ClientSize = new System.Drawing.Size(430, 450);
       this.Controls.Add(this.errorLabel);
-      this.Controls.Add(this.textBox1);
+      this.Controls.Add(this.txtAccessToken);
       this.Controls.Add(this.label1);
       this.Controls.Add(this.saveBtn);
       this.Controls.Add(this.exitBtn);
@@ -110,7 +111,7 @@
     private System.Windows.Forms.Button exitBtn;
     private System.Windows.Forms.Button saveBtn;
     private System.Windows.Forms.Label label1;
-    private System.Windows.Forms.TextBox textBox1;
+    private System.Windows.Forms.TextBox txtAccessToken;
     private System.Windows.Forms.Label errorLabel;
   }
 }

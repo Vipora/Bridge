@@ -30,13 +30,16 @@ namespace Bridge
 
     private NotifyIcon trayIcon;
     private ContextMenu contextMenu;
-    public GUI()
+    public string accessToken;
+    public event EventHandler<AccessTokenChangedEventArgs> AccessTokenChanged;
+    public GUI(string accessToken = "")
     {
       InitializeComponent();
       this.BackColor = c_darker;
       this.saveBtn.BackColor = c_base;
       this.exitBtn.BackColor = c_base;
-
+      this.accessToken = accessToken;
+      this.txtAccessToken.Text = this.accessToken;
 
       this.trayIcon = new NotifyIcon();
       this.trayIcon.Icon = GetIcon(LeagueClientState.NotRunning);
@@ -101,5 +104,24 @@ namespace Bridge
         Hide();
       }
     }
+
+    private void saveBtn_Click(object sender, EventArgs e)
+    {
+      if (this.accessToken != this.txtAccessToken.Text)
+      {
+        this.accessToken = this.txtAccessToken.Text;
+        if (this.AccessTokenChanged != null)
+        {
+          var args = new AccessTokenChangedEventArgs();
+          args.AccessToken = this.accessToken;
+          this.AccessTokenChanged(this, args);
+        }
+      }
+    }
   }
+  public class AccessTokenChangedEventArgs : EventArgs
+  {
+    public string AccessToken { get; set; }
+  }
+
 }

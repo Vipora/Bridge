@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.IO;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace Bridge
@@ -30,16 +32,42 @@ namespace Bridge
 
     public async Task Run()
     {
+      //TODO: Change the storage of tokens later on
+      string token = await ReadAccessTokenFromFile();
       client.Connect();
       await Task.Run(() =>
       {
         // Create the Gui here to cricumvent some threading issues
         // TODO: Find a better solution
-        this.gui = new GUI();
+        this.gui = new GUI(token);
+        this.gui.AccessTokenChanged += Gui_AccessTokenChanged;
         this.gui.SetTrayIconVisibility(true);
         Application.Run(this.gui);
         this.gui.SetTrayIconVisibility(false);
       });
+    }
+
+    private void Gui_AccessTokenChanged(object sender, AccessTokenChangedEventArgs e)
+    {
+      //Store new access token
+      var filePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Vipora", "token.txt");
+      System.IO.FileInfo file = new System.IO.FileInfo(filePath);
+      file.Directory.Create(); // If the directory already exists, this method does nothing.
+      System.IO.File.WriteAllText(file.FullName, e.AccessToken);
+    }
+
+    public async Task<string> ReadAccessTokenFromFile()
+    {
+      var filepath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Vipora", "token.txt");
+      if (File.Exists(filepath))
+      {
+        using (var fileStream = new FileStream(filepath, FileMode.Open, FileAccess.Read))
+        using (var reader = new StreamReader(fileStream))
+        {
+          return await reader.ReadToEndAsync();
+        }
+      }
+      return string.Empty;
     }
 
   }
