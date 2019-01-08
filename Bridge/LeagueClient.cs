@@ -55,6 +55,7 @@ namespace Bridge
     {
       this.process = await this.FindLeagueProcess();
       this.ChangeState(LeagueClientState.ProcessFound);
+      // This might fail if the league client and the bridge are running with different privileges
       this.installDirectory = INSTALL_REGEX.Match(process.GetCommandLine()).Groups[1].Value;
       var lockfile = await this.GetLockfileContents();
       var items = lockfile.Split(':');

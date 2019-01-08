@@ -26,7 +26,7 @@ namespace Bridge
     }
 
     private void Client_LeagueClientStateChanged(object sender, ClientStateChangedEventArgs e)
-    {
+    {                 
       this.gui.UpdateLeagueClientState(e.State);
     }
 
@@ -34,12 +34,12 @@ namespace Bridge
     {
       //TODO: Change the storage of tokens later on
       string token = await ReadAccessTokenFromFile();
-      client.Connect();
       await Task.Run(() =>
       {
         // Create the Gui here to cricumvent some threading issues
         // TODO: Find a better solution
         this.gui = new GUI(token);
+        client.Connect();
         this.gui.AccessTokenChanged += Gui_AccessTokenChanged;
         this.gui.SetTrayIconVisibility(true);
         Application.Run(this.gui);
