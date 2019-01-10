@@ -37,7 +37,8 @@ namespace Bridge
       InitializeComponent();
       this.BackColor = c_darker;
       this.saveBtn.BackColor = c_base;
-      this.exitBtn.BackColor = c_base;
+      this.exitBtn.BackColor = c_darker;
+      this.closeBtn.BackColor = c_base;
       this.accessToken = accessToken;
       this.txtAccessToken.Text = this.accessToken;
 
@@ -117,6 +118,11 @@ namespace Bridge
           this.AccessTokenChanged(this, args);
         }
       }
+    }
+
+    private void closeBtn_Click(object sender, EventArgs e)
+    {
+      this.Hide();
     }
   }
   public class AccessTokenChangedEventArgs : EventArgs
