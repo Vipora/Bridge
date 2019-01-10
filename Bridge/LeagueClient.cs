@@ -76,6 +76,7 @@ namespace Bridge
 
       this.webSocket.OnError += WebSocket_OnError;
       this.webSocket.OnMessage += WebSocket_OnMessage;
+      this.webSocket.OnClose += WebSocket_OnClose;
 
       await Task.Run(() => this.webSocket.Connect());
       if (events != null)
@@ -88,6 +89,13 @@ namespace Bridge
 
       this.ChangeState(LeagueClientState.Connected);
       return true;
+    }
+
+    private void WebSocket_OnClose(object sender, CloseEventArgs e)
+    {
+      Console.WriteLine("Websocket closed");
+      Console.WriteLine("Trying to reconnect...");
+      Task.Run(() => this.Connect()).GetAwaiter().GetResult();
     }
 
     private void ChangeState(LeagueClientState newState)
@@ -153,6 +161,9 @@ namespace Bridge
 
     private async Task<Process> FindLeagueProcess()
     {
+      // If the process has already been found and is still running, return it
+      if (!this.process.HasExited) return this.process;
+      // Get the process if it has not already been found
       Process process = null;
       while (process == null)
       {
