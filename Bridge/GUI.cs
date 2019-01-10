@@ -67,7 +67,10 @@ namespace Bridge
       this.trayIcon.ContextMenu = this.contextMenu;
 
       this.ShowInTaskbar = false;
-      this.WindowState = FormWindowState.Minimized;
+
+      // If the token is not yet set, open the options menu on startup. Else hide it
+      if (!string.IsNullOrEmpty(accessToken))
+        this.WindowState = FormWindowState.Minimized;
 
       this.FormClosing += GUI_FormClosing;
     }
@@ -99,6 +102,7 @@ namespace Bridge
 
     private void GUI_FormClosing(object sender, FormClosingEventArgs e)
     {
+      // Hide the form instead of closing it
       if (e.CloseReason == CloseReason.UserClosing)
       {
         e.Cancel = true;

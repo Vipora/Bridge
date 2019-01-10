@@ -114,6 +114,8 @@
       this.Controls.Add(this.exitBtn);
       this.ForeColor = System.Drawing.SystemColors.Window;
       this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+      this.MaximizeBox = false;
+      this.MinimizeBox = false;
       this.Name = "GUI";
       this.ShowInTaskbar = false;
       this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
