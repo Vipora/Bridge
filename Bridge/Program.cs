@@ -26,25 +26,25 @@ namespace Bridge
     }
 
     private void Client_LeagueClientStateChanged(object sender, ClientStateChangedEventArgs e)
-    {                 
-      this.gui.UpdateLeagueClientState(e.State);
+    { 
+      if(this.gui != null)
+        this.gui.UpdateLeagueClientState(e.State);
     }
 
     public async Task Run()
     {
       //TODO: Change the storage of tokens later on
       string token = await ReadAccessTokenFromFile();
-      await Task.Run(() =>
-      {
-        // Create the Gui here to cricumvent some threading issues
-        // TODO: Find a better solution
+      var clientTask = client.Connect();
+      var appTask = Task.Run(() => {
         this.gui = new GUI(token);
-        client.Connect();
         this.gui.AccessTokenChanged += Gui_AccessTokenChanged;
         this.gui.SetTrayIconVisibility(true);
+        this.gui.UpdateLeagueClientState(client.State);
         Application.Run(this.gui);
         this.gui.SetTrayIconVisibility(false);
-      });
+      });      
+      await Task.WhenAll(clientTask, appTask);
     }
 
     private void Gui_AccessTokenChanged(object sender, AccessTokenChangedEventArgs e)

@@ -18,7 +18,8 @@ namespace Bridge
     NotRunning = 0,
     ProcessFound = 1,
     ReadyToConnect = 2,
-    Connected = 3
+    Connected = 3,
+    Disconected = 4
   }
 
   class LeagueClient
@@ -93,6 +94,7 @@ namespace Bridge
 
     private void WebSocket_OnClose(object sender, CloseEventArgs e)
     {
+      this.ChangeState(LeagueClientState.Disconected);
       Console.WriteLine("Websocket closed");
       Console.WriteLine("Trying to reconnect...");
       Task.Run(() => this.Connect()).GetAwaiter().GetResult();
@@ -162,7 +164,7 @@ namespace Bridge
     private async Task<Process> FindLeagueProcess()
     {
       // If the process has already been found and is still running, return it
-      if (!this.process.HasExited) return this.process;
+      if (this.process != null && !this.process.HasExited) return this.process;
       // Get the process if it has not already been found
       Process process = null;
       while (process == null)

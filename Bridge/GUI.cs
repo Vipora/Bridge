@@ -20,7 +20,8 @@ namespace Bridge
       { LeagueClientState.NotRunning, Bridge.Properties.Resources.NotRunningStateIcon },
       { LeagueClientState.ProcessFound, Bridge.Properties.Resources.ReadyToConnectStateIcon },
       { LeagueClientState.ReadyToConnect, Bridge.Properties.Resources.ReadyToConnectStateIcon },
-      { LeagueClientState.Connected, Bridge.Properties.Resources.RunningStateIcon }
+      { LeagueClientState.Connected, Bridge.Properties.Resources.RunningStateIcon },
+      { LeagueClientState.Disconected, Bridge.Properties.Resources.ErrorStateIcon },
     };
 
     public static Icon GetIcon(LeagueClientState state = LeagueClientState.Unkown)
