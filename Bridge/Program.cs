@@ -26,8 +26,8 @@ namespace Bridge
     }
 
     private void Client_LeagueClientStateChanged(object sender, ClientStateChangedEventArgs e)
-    { 
-      if(this.gui != null)
+    {
+      if (this.gui != null)
         this.gui.UpdateLeagueClientState(e.State);
     }
 
@@ -35,15 +35,22 @@ namespace Bridge
     {
       //TODO: Change the storage of tokens later on
       string token = await ReadAccessTokenFromFile();
+
+      var server = new ServerConnection(token);
+      Console.WriteLine("Connecting to server");
+      Console.WriteLine(await server.connect());
       var clientTask = client.Connect();
-      var appTask = Task.Run(() => {
+      var appTask = Task.Run(() =>
+      {
+        // Create the Gui here to cricumvent some threading issues
+        // TODO: Find a better solution
         this.gui = new GUI(token);
         this.gui.AccessTokenChanged += Gui_AccessTokenChanged;
         this.gui.SetTrayIconVisibility(true);
         this.gui.UpdateLeagueClientState(client.State);
         Application.Run(this.gui);
         this.gui.SetTrayIconVisibility(false);
-      });      
+      });
       await Task.WhenAll(clientTask, appTask);
     }
 

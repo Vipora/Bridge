@@ -158,6 +158,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="ServerConnection.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
