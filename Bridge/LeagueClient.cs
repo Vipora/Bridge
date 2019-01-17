@@ -28,6 +28,7 @@ namespace Bridge
 
     private HttpClient httpClient;
     private WebSocket webSocket;
+    private ServerConnection server;
 
     private Process process;
     private string installDirectory;
@@ -38,8 +39,9 @@ namespace Bridge
 
     public LeagueClientState State { get; private set; }
 
-    public LeagueClient()
+    public LeagueClient(ServerConnection server)
     {
+      this.server = server;
       this.State = LeagueClientState.NotRunning;
       var handler = new HttpClientHandler();
       handler.ClientCertificateOptions = ClientCertificateOption.Manual;
@@ -119,7 +121,8 @@ namespace Bridge
 
     private void WebSocket_OnMessage(object sender, MessageEventArgs e)
     {
-      Console.WriteLine(e.Data);
+      var msg = JsonConvert.DeserializeObject<Dictionary<string, dynamic>>(e.Data);
+      this.server.SendEvent(msg);
     }
 
     private void WebSocket_OnError(object sender, WebSocketSharp.ErrorEventArgs e)

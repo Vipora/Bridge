@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
-using System.Threading.Tasks;
 using WebSocketSharp;
 
 namespace Bridge
@@ -24,7 +23,7 @@ namespace Bridge
       Console.WriteLine(this.url);
     }
 
-    public async Task<bool> connect()
+    public bool Connect()
     {
       this.webSocket = new WebSocket(this.url);
       this.webSocket.OnMessage += WebSocket_OnMessage;
@@ -34,6 +33,21 @@ namespace Bridge
       this.webSocket.Connect();
       this.webSocket.Send(Encoding.ASCII.GetBytes("{\"t\":1, \"d\":{\"topic\":\"bridge:Test\"}}"));
       return true;
+    }
+
+    public void SendEvent(Dictionary<string, dynamic> data)
+    {
+      var msg = new EventMessage
+      {
+        Data = new EventMessage.EventMessageData
+        {
+          Topic = "bridge:Test",
+          EventType = "bridge",
+          Data = data
+        }
+      };
+      Console.WriteLine(JsonConvert.SerializeObject(msg));
+      this.webSocket.Send(Encoding.ASCII.GetBytes(JsonConvert.SerializeObject(msg)));
     }
 
     private void WebSocket_OnClose(object sender, CloseEventArgs e)
@@ -51,7 +65,7 @@ namespace Bridge
       var message = JsonConvert.DeserializeObject<ServerMessage>(e.Data);
       // This is a login message
       // TODO: In case of reconnect, this task will run multiple times
-      if (message.Type == 1)
+      if (message.Type == 0)
       {
         PeriodicTask.Run(() =>
         {
@@ -59,6 +73,7 @@ namespace Bridge
         }, TimeSpan.FromMilliseconds(Convert.ToDouble(message.Data["clientInterval"])));
       }
       Console.WriteLine(e.Data);
+
     }
   }
 
@@ -69,5 +84,25 @@ namespace Bridge
 
     [JsonProperty("d")]
     public Dictionary<string, string> Data { get; set; }
+  }
+
+  public class EventMessage
+  {
+    [JsonProperty("t")]
+    public int Type { get; } = 7;
+
+    [JsonProperty("d")]
+    public EventMessageData Data { get; set; }
+
+    public class EventMessageData
+    {
+      [JsonProperty("topic")]
+      public string Topic { get; set; }
+
+      [JsonProperty("event")]
+      public string EventType { get; set; }
+      [JsonProperty("data")]
+      public Dictionary<string, dynamic> Data { get; set; }
+    }
   }
 }

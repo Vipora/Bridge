@@ -38,7 +38,7 @@ namespace Bridge
 
       var server = new ServerConnection(token);
       Console.WriteLine("Connecting to server");
-      Console.WriteLine(await server.connect());
+      Console.WriteLine(server.Connect());
       var clientTask = client.Connect();
       var appTask = Task.Run(() =>
       {
