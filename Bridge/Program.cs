@@ -14,8 +14,6 @@ namespace Bridge
       program.Run().GetAwaiter().GetResult();
     }
 
-    private NotifyIcon trayIcon;
-    private ContextMenu contextMenu;
     private LeagueClient client;
     private GUI gui;
 
@@ -39,6 +37,7 @@ namespace Bridge
       var server = new ServerConnection(token);
       Console.WriteLine("Connecting to server");
       Console.WriteLine(server.Connect());
+      client.Server = server;
       var clientTask = client.Connect();
       var appTask = Task.Run(() =>
       {
