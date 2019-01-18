@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -38,7 +39,12 @@ namespace Bridge
       Console.WriteLine("Connecting to server");
       Console.WriteLine(server.Connect());
       client.Server = server;
-      var clientTask = client.Connect();
+      var clientTask = client.Connect(new List<string>{
+        "OnJsonApiEvent_lol-login_v1_session",
+        "OnJsonApiEvent_lol-champ-select_v1_current-champion",
+        "OnJsonApiEvent_lol-champ-select_v1_session",
+        "OnJsonApiEvent_lol-champ-select_v1_team-boost" 
+       });
       var appTask = Task.Run(() =>
       {
         // Create the Gui here to cricumvent some threading issues

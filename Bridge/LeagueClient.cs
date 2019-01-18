@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -30,6 +31,8 @@ namespace Bridge
     private WebSocket webSocket;
     public ServerConnection Server { get; set; }
 
+    private EventParser eventParser;
+
     private Process process;
     private string installDirectory;
     private string token;
@@ -41,6 +44,7 @@ namespace Bridge
 
     public LeagueClient()
     {
+      eventParser = new EventParser(this);
       this.State = LeagueClientState.NotRunning;
       var handler = new HttpClientHandler();
       handler.ClientCertificateOptions = ClientCertificateOption.Manual;
@@ -120,9 +124,20 @@ namespace Bridge
 
     private void WebSocket_OnMessage(object sender, MessageEventArgs e)
     {
-      var msg = JsonConvert.DeserializeObject<Dictionary<string, dynamic>>(e.Data);
-      if (this.Server != null)
-        this.Server.SendEvent(msg);
+      if (e.Data != null && e.IsText)
+      {
+        var eventArray = JArray.Parse(e.Data);
+        var eventNumber = eventArray[0].ToObject<int>();
+        if(eventNumber == 8)
+        {
+          Console.WriteLine(e.Data);
+          var leagueEvent = eventArray[2].ToObject<LCUMessage>();
+          if(this.Server != null)
+          {
+            this.Server.SendEvent(eventParser.ParseEvent(leagueEvent));
+          }
+        }        
+      }
     }
 
     private void WebSocket_OnError(object sender, WebSocketSharp.ErrorEventArgs e)
@@ -195,6 +210,18 @@ namespace Bridge
   public class ClientStateChangedEventArgs : EventArgs
   {
     public LeagueClientState State { get; set; }
+  }
+
+  public class LCUMessage
+  {
+    [JsonProperty("data")]
+    public JToken Data { get; set; }
+
+    [JsonProperty("eventType")]
+    public string EventType { get; set; }
+
+    [JsonProperty("uri")]
+    public string Uri { get; set; }
   }
 
 }

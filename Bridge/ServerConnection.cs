@@ -35,15 +35,16 @@ namespace Bridge
       return true;
     }
 
-    public void SendEvent(Dictionary<string, dynamic> data)
+    public void SendEvent(LCUMessage message)
     {
+      if (message == null) return;
       var msg = new EventMessage
       {
         Data = new EventMessage.EventMessageData
         {
           Topic = "bridge:Test",
           EventType = "bridge",
-          Data = data
+          Message = message
         }
       };
       Console.WriteLine(JsonConvert.SerializeObject(msg));
@@ -102,7 +103,7 @@ namespace Bridge
       [JsonProperty("event")]
       public string EventType { get; set; }
       [JsonProperty("data")]
-      public Dictionary<string, dynamic> Data { get; set; }
+      public LCUMessage Message { get; set; }
     }
   }
 }
