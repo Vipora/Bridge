@@ -55,7 +55,7 @@ namespace Bridge
         Application.Run(this.gui);
         this.gui.SetTrayIconVisibility(false);
       });
-      await Task.WhenAny(clientTask, appTask);
+      await appTask;
     }
 
     private void Gui_AccessTokenChanged(object sender, AccessTokenChangedEventArgs e)

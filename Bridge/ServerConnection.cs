@@ -41,15 +41,17 @@ namespace Bridge
       this.webSocket.OnMessage += WebSocket_OnMessage;
       this.webSocket.OnError += WebSocket_OnError;
       this.webSocket.OnClose += WebSocket_OnClose;
-
-      var result = await httpClient.GetAsync("user");
-      if (!result.IsSuccessStatusCode)
+      try
       {
+        var result = await httpClient.GetAsync("user");
+        if (!result.IsSuccessStatusCode)
+        {
+          return false;
+        }
+        this.user = JsonConvert.DeserializeObject<User>(await result.Content.ReadAsStringAsync());
+      } catch {
         return false;
       }
-      Console.WriteLine(await result.Content.ReadAsStringAsync());
-      this.user = JsonConvert.DeserializeObject<User>(await result.Content.ReadAsStringAsync());
-      
 
       this.webSocket.Connect();
       this.webSocket.Send(Encoding.ASCII.GetBytes("{\"t\":1, \"d\":{\"topic\":\"bridge:" + this.user.Email + "\"}}"));
@@ -74,12 +76,17 @@ namespace Bridge
 
     private void WebSocket_OnClose(object sender, CloseEventArgs e)
     {
-      Console.WriteLine(e);
+      do
+      {
+        Console.WriteLine("Server disconnected");
+        Console.WriteLine("Trying to reconnect...");
+      } while (!Task.Run(() => this.Connect()).GetAwaiter().GetResult());
+      Console.WriteLine("Reconnected!");
     }
 
     private void WebSocket_OnError(object sender, ErrorEventArgs e)
     {
-      Console.WriteLine(e);
+      Console.WriteLine(e.Message);
     }
 
     private void WebSocket_OnMessage(object sender, MessageEventArgs e)
