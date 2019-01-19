@@ -2,7 +2,9 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Net.Http;
 using System.Text;
+using System.Threading.Tasks;
 using WebSocketSharp;
 
 namespace Bridge
@@ -11,27 +13,46 @@ namespace Bridge
 
   class ServerConnection
   {
-    private const string debugUrl = "ws://localhost:3333/websocket?authorization=";
-    private const string liveUrl = "ws://live-url/websocket?authorization=";
+    private const string debugUrl = "localhost:3333/";
+    private const string liveUrl = "live-url/websocket?authorization=";
 
-    private string url;
+    private string baseUrl;
+    private string token;
+    private HttpClient httpClient;
+    private User user;
+
     private WebSocket webSocket;
 
     public ServerConnection(string token)
     {
-      this.url = (Debugger.IsAttached ? debugUrl : liveUrl) + token;
-      Console.WriteLine(this.url);
+      this.baseUrl = (Debugger.IsAttached ? debugUrl : liveUrl);
+      this.httpClient = new HttpClient();
+      this.httpClient.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+      this.httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", token);
+      this.httpClient.BaseAddress = new Uri("http://" + this.baseUrl + "api/v1/");
+
+      this.token = token;
+      Console.WriteLine(this.baseUrl);
     }
 
-    public bool Connect()
+    public async Task<bool> Connect()
     {
-      this.webSocket = new WebSocket(this.url);
+      this.webSocket = new WebSocket("ws://" + this.baseUrl + "websocket?authorization=" + this.token);
       this.webSocket.OnMessage += WebSocket_OnMessage;
       this.webSocket.OnError += WebSocket_OnError;
       this.webSocket.OnClose += WebSocket_OnClose;
 
+      var result = await httpClient.GetAsync("user");
+      if (!result.IsSuccessStatusCode)
+      {
+        return false;
+      }
+      Console.WriteLine(await result.Content.ReadAsStringAsync());
+      this.user = JsonConvert.DeserializeObject<User>(await result.Content.ReadAsStringAsync());
+      
+
       this.webSocket.Connect();
-      this.webSocket.Send(Encoding.ASCII.GetBytes("{\"t\":1, \"d\":{\"topic\":\"bridge:Test\"}}"));
+      this.webSocket.Send(Encoding.ASCII.GetBytes("{\"t\":1, \"d\":{\"topic\":\"bridge:" + this.user.Email + "\"}}"));
       return true;
     }
 
@@ -105,5 +126,14 @@ namespace Bridge
       [JsonProperty("data")]
       public LCUMessage Message { get; set; }
     }
+  }
+
+  public class User
+  {
+    [JsonProperty("username")]
+    public string Name { get; set; }
+
+    [JsonProperty("email")]
+    public string Email { get; set; }
   }
 }

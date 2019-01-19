@@ -42,8 +42,7 @@ namespace Bridge
       var clientTask = client.Connect(new List<string>{
         "OnJsonApiEvent_lol-login_v1_session",
         "OnJsonApiEvent_lol-champ-select_v1_current-champion",
-        "OnJsonApiEvent_lol-champ-select_v1_session",
-        "OnJsonApiEvent_lol-champ-select_v1_team-boost" 
+        "OnJsonApiEvent_lol-champ-select_v1_session"
        });
       var appTask = Task.Run(() =>
       {
@@ -56,7 +55,7 @@ namespace Bridge
         Application.Run(this.gui);
         this.gui.SetTrayIconVisibility(false);
       });
-      await Task.WhenAll(clientTask, appTask);
+      await Task.WhenAny(clientTask, appTask);
     }
 
     private void Gui_AccessTokenChanged(object sender, AccessTokenChangedEventArgs e)

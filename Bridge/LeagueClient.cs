@@ -130,7 +130,6 @@ namespace Bridge
         var eventNumber = eventArray[0].ToObject<int>();
         if(eventNumber == 8)
         {
-          Console.WriteLine(e.Data);
           var leagueEvent = eventArray[2].ToObject<LCUMessage>();
           if(this.Server != null)
           {
